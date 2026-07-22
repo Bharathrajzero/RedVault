@@ -1,7 +1,7 @@
 <div align="center">
 
   <!-- Logo / Image Placeholder -->
-  <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='%23cbd5e1' d='M50 5 L10 23 v27 c0 25 40 45 40 45 s40 -20 40 -45 V23 Z'/><path fill='%23dc2626' d='M50 32 c-6.6 0-12 5.4-12 12 v8 h-3 c-2.2 0-4 1.8-4 4 v20 c0 2.2 1.8 4 4 4 h30 c2.2 0 4-1.8 4-4 V56 c0-2.2-1.8-4-4-4 h-3 v-8 c0-6.6-5.4-12-12-12 z m7 20 H43 v-8 c0-3.9 3.1-7 7-7 s7 3.1 7 7 v8 z'/></svg>" alt="RedVault 256 Logo" width="120" height="120">
+  <img src="public/logo.png" alt="RedVault 256 Logo" width="120" height="120">  
 
   # RedVault 256
 
@@ -34,23 +34,6 @@
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#-overview)
-- [Key Features](#-key-features)
-- [Project Structure](#-project-structure)
-- [Container Binary Specification](#-container-binary-specification)
-- [System Architecture](#-system-architecture)
-- [Tech Stack](#-tech-stack)
-- [Quick Start](#-quick-start)
-- [Configuration](#-configuration)
-- [Future Production Upgrade: Supabase Integration](#-future-production-upgrade-supabase-integration)
-- [Roadmap](#-roadmap)
-- [Contributing](#-contributing)
-- [License & Author](#-license--author)
-
----
-
 ## 🔍 Overview
 
 **RedVault 256** is a client-side cryptographic engine and live rendering vault. Built directly on top of the native browser Web Crypto API (AES-GCM 256-bit with PBKDF2 key derivation), it packages raw files, metadata, cryptographic salt, and IVs into a custom `.vault` container format—ensuring your sensitive data remains completely private and unreadable to third-party servers.
@@ -68,7 +51,13 @@
 ```
 
 ---
+## Screenshots
+<img width="1920" height="1079" alt="91" src="https://github.com/user-attachments/assets/15b4d7f3-29d5-41ad-85b4-0e0f7cd62f4f" />
+<img width="1588" height="1938" alt="92" src="https://github.com/user-attachments/assets/9f7a2b9b-3944-4f2d-9444-0c4ca6dab769" />
+<img width="1588" height="1123" alt="93" src="https://github.com/user-attachments/assets/3a3410a6-d534-4f90-b705-c14194759799" />
+<img width="1588" height="1123" alt="94" src="https://github.com/user-attachments/assets/b1534862-2cd6-4b71-a5f1-953711d83fa7" />
 
+---
 ## ✨ Key Features
 
 | Feature | Description |
