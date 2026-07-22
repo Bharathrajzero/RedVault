@@ -53,9 +53,9 @@
 ---
 ## Screenshots
 <img width="1920" height="1079" alt="91" src="https://github.com/user-attachments/assets/15b4d7f3-29d5-41ad-85b4-0e0f7cd62f4f" />
-<img width="1588" height="1938" alt="92" src="https://github.com/user-attachments/assets/9f7a2b9b-3944-4f2d-9444-0c4ca6dab769" />
+<img width="1588" height="1938" alt="94" src="https://github.com/user-attachments/assets/9f7a2b9b-3944-4f2d-9444-0c4ca6dab769" />
 <img width="1588" height="1123" alt="93" src="https://github.com/user-attachments/assets/3a3410a6-d534-4f90-b705-c14194759799" />
-<img width="1588" height="1123" alt="94" src="https://github.com/user-attachments/assets/b1534862-2cd6-4b71-a5f1-953711d83fa7" />
+<img width="1588" height="1123" alt="92" src="https://github.com/user-attachments/assets/b1534862-2cd6-4b71-a5f1-953711d83fa7" />
 
 ---
 ## ✨ Key Features
