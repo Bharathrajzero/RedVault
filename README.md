@@ -16,12 +16,6 @@
 
   <!-- Badges -->
   <p align="center">
-    <a href="https://github.com/Bharathrajzero/RedVault/actions">
-      <img src="https://img.shields.io/github/actions/workflow/status/Bharathrajzero/RedVault/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Build Status">
-    </a>
-    <a href="https://codecov.io/gh/Bharathrajzero/RedVault">
-      <img src="https://img.shields.io/codecov/c/github/Bharathrajzero/RedVault?style=for-the-badge&logo=codecov&logoColor=white" alt="Coverage Status">
-    </a>
     <a href="https://github.com/Bharathrajzero/RedVault/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/Bharathrajzero/RedVault?style=for-the-badge&color=blue" alt="License">
     </a>
