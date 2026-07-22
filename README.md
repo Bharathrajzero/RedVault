@@ -52,10 +52,21 @@
 
 ---
 ## Screenshots
-<img width="1920" height="1079" alt="91" src="https://github.com/user-attachments/assets/15b4d7f3-29d5-41ad-85b4-0e0f7cd62f4f" />
-<img width="1588" height="1938" alt="94" src="https://github.com/user-attachments/assets/9f7a2b9b-3944-4f2d-9444-0c4ca6dab769" />
-<img width="1588" height="1123" alt="93" src="https://github.com/user-attachments/assets/3a3410a6-d534-4f90-b705-c14194759799" />
-<img width="1588" height="1123" alt="92" src="https://github.com/user-attachments/assets/b1534862-2cd6-4b71-a5f1-953711d83fa7" />
+<!-- Image 1 (Full Width) -->
+<div style="width: 100%; margin-bottom: 10px;">
+  <img width="100%" alt="RedVault Screenshot 1" src="https://github.com/user-attachments/assets/dd8ab71b-9767-4da8-89f5-e0873e032c42">
+</div>
+
+<!-- Images 2 & 3 (Side-by-Side in 1 Line) -->
+<div style="display: flex; gap: 10px; margin-bottom: 10px;">
+  <img width="49%" alt="RedVault Screenshot 2" src="https://github.com/user-attachments/assets/3fd37fb6-42cc-43f2-a567-5aadef081b3b">
+  <img width="49%" alt="RedVault Screenshot 3" src="https://github.com/user-attachments/assets/f692ac95-9acd-432f-8964-a3c844dd887f">
+</div>
+
+<!-- Image 4 (Full Width) -->
+<div style="width: 100%;">
+  <img width="100%" alt="RedVault Screenshot 4" src="https://github.com/user-attachments/assets/7a75f1d9-bf08-4149-b4fd-3f0e1ece7d1a">
+</div>
 
 ---
 ## ✨ Key Features
