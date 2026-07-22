@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RedVault 256 - Multi-Media Vault & Encryption Engine</title>
+  
+  <!-- RedVault 256 Embedded SVG Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='%23cbd5e1' d='M50 5 L10 23 v27 c0 25 40 45 40 45 s40 -20 40 -45 V23 Z'/><path fill='%23dc2626' d='M50 32 c-6.6 0-12 5.4-12 12 v8 h-3 c-2.2 0-4 1.8-4 4 v20 c0 2.2 1.8 4 4 4 h30 c2.2 0 4-1.8 4-4 V56 c0-2.2-1.8-4-4-4 h-3 v-8 c0-6.6-5.4-12-12-12 z m7 20 H43 v-8 c0-3.9 3.1-7 7-7 s7 3.1 7 7 v8 z'/></svg>">
+
+  <style>
+    :root {
+      --bg-main: #f8fafc;
+      --card-bg: #ffffff;
+      
+      /* Red Theme Palette */
+      --primary: #dc2626;
+      --primary-hover: #b91c1c;
+      --primary-light: #fef2f2;
+      --primary-border: #fca5a5;
+      --primary-glow: rgba(220, 38, 38, 0.25);
+
+      /* Silver & Metallic Slate */
+      --silver-light: #f1f5f9;
+      --silver-mid: #e2e8f0;
+      --silver-dark: #cbd5e1;
+      --silver-text: #64748b;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 10px 20px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+      --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* --- OPENING LOADING SPLASH SCREEN (WHITE BACKGROUND) --- */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.7s;
+    }
+
+    .splash-screen.dismissed {
+      opacity: 0;
+      transform: scale(1.04);
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-content {
+      text-align: center;
+      max-width: 480px;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Animated Logo Shield */
+    .splash-logo-wrapper {
+      position: relative;
+      margin-bottom: 24px;
+      animation: logoPop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .splash-logo-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: rgba(220, 38, 38, 0.18);
+      filter: blur(22px);
+      border-radius: 50%;
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+
+    .splash-logo-box {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      background: #ffffff;
+      border: 1px solid var(--silver-dark);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .splash-logo-box svg {
+      width: 56px;
+      height: 56px;
+    }
+
+    /* Animated Title & Brand Name */
+    .splash-title {
+      font-size: 2.3rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #0f172a;
+      opacity: 0;
+      animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+
+    .splash-title .text-red {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .splash-title .badge-256 {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+
+    .splash-tagline {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 500;
+      opacity: 0;
+      animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+    }
+
+    /* Animated Loading Bar */
+    .splash-loader-wrapper {
+      width: 220px;
+      height: 5px;
+      background: var(--silver-light);
+      border: 1px solid var(--silver-mid);
+      border-radius: 999px;
+      margin-top: 36px;
+      overflow: hidden;
+      position: relative;
+      opacity: 0;
+      animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+    }
+
+    .splash-loader-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+      border-radius: 999px;
+      animation: loadProgress 2.2s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+    }
+
+    .splash-status-text {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+    }
+
+    /* Keyframe Animations */
+    @keyframes logoPop {
+      0% { opacity: 0; transform: scale(0.4) rotate(-6deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(18px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+      50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
+    }
+
+    @keyframes loadProgress {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    /* --- HEADER & BRANDING --- */
+    .header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border: 1px solid var(--silver-dark);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      transition: var(--transition-smooth);
+    }
+    .brand:hover .brand-logo {
+      transform: translateY(-1px);
+      border-color: var(--primary-border);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .brand-logo svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .brand-title .text-red {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+    .brand-title .text-vault {
+      color: var(--text-main);
+      text-transform: uppercase;
+    }
+    .brand-title .badge-256 {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-left: 4px;
+      letter-spacing: 0.05em;
+    }
+    .brand-tagline {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 3px;
+    }
+
+    /* --- MAIN CONTENT & TAB SYSTEM --- */
+    .main-container {
+      max-width: 900px;
+      margin: 36px auto;
+      padding: 0 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    .tabs-wrapper {
+      display: flex;
+      background: var(--silver-mid);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      gap: 4px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      background: transparent;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .tab-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .tab-btn.active svg {
+      fill: var(--primary);
+    }
+
+    /* Tab Switch Animation */
+    .tab-panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .tab-panel.active-panel {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Cards & Components */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 36px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 24px;
+    }
+    .card-header-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+    .card-description {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* Dropzones */
+    .dropzone {
+      border: 2px dashed var(--silver-dark);
+      border-radius: 10px;
+      padding: 36px 20px;
+      text-align: center;
+      background: var(--bg-main);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: scale(1.005);
+    }
+    .dropzone input[type="file"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .dropzone-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 12px;
+      fill: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+    .dropzone:hover .dropzone-icon {
+      fill: var(--primary);
+      transform: translateY(-2px);
+    }
+    .dropzone-text { font-size: 0.95rem; font-weight: 600; color: var(--text-main); }
+    .dropzone-sub { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+    .file-selected-name {
+      margin-top: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+
+    /* Form Fields & Buttons */
+    .form-group { margin-top: 22px; }
+    .label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #ffffff;
+      color: var(--text-main);
+      transition: var(--transition-smooth);
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 24px;
+      transition: var(--transition-smooth);
+      box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-primary svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0) scale(0.99); }
+
+    /* Media Preview Area */
+    .preview-card {
+      margin-top: 24px;
+      padding: 24px;
+      background: var(--silver-light);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .preview-content { margin-top: 16px; }
+    .preview-content img, .preview-content video {
+      max-width: 100%;
+      max-height: 450px;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+    }
+    .preview-content audio { width: 100%; margin-top: 10px; }
+    .preview-content iframe { width: 100%; height: 450px; border: 1px solid var(--border-color); border-radius: 8px; }
+    .preview-content pre {
+      text-align: left;
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- PROFESSIONAL FOOTER STYLES --- */
+    .footer {
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      padding: 24px 0;
+      margin-top: auto;
+    }
+    .footer-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-brand-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .footer-brand-info strong {
+      color: var(--text-main);
+    }
+    .footer-credits {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .footer-credits span {
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .footer-link-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+    .footer-link-btn:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .nav-container, .footer-container { flex-direction: column; gap: 12px; text-align: center; }
+      .card { padding: 24px; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- OPENING LOADING SPLASH SCREEN -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo-wrapper">
+        <div class="splash-logo-glow"></div>
+        <div class="splash-logo-box">
+          <svg viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="silverSplashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f8fafc"/>
+                <stop offset="50%" stop-color="#cbd5e1"/>
+                <stop offset="100%" stop-color="#64748b"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#silverSplashGrad)" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            <path fill="#dc2626" d="M12 7c-1.38 0-2.5 1.12-2.5 2.5V11H9c-.55 0-1 .45-1 1v4.5c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V12c0-.55-.45-1-1-1h-.5V9.5C14.5 8.12 13.38 7 12 7zm1.5 4h-3V9.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V11z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="splash-title">
+        <span class="text-red">RED</span><span>VAULT</span>
+        <span class="badge-256">256</span>
+      </div>
+      <div class="splash-tagline">Multi-Media Vault & Encryption Engine</div>
+      
+      <!-- Progress Bar Loader -->
+      <div class="splash-loader-wrapper">
+        <div class="splash-loader-bar"></div>
+      </div>
+      <div class="splash-status-text">Powered by AlphaGroup</div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="silverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f8fafc"/>
+                <stop offset="50%" stop-color="#cbd5e1"/>
+                <stop offset="100%" stop-color="#64748b"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#silverGradient)" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            <path fill="#dc2626" d="M12 7c-1.38 0-2.5 1.12-2.5 2.5V11H9c-.55 0-1 .45-1 1v4.5c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V12c0-.55-.45-1-1-1h-.5V9.5C14.5 8.12 13.38 7 12 7zm1.5 4h-3V9.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V11z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            <span class="text-red">RED</span><span class="text-vault">VAULT</span>
+            <span class="badge-256">256</span>
+          </div>
+          <div class="brand-tagline">Multi-Media Vault & Encryption Engine</div>
+        </div>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="main-container">
+
+    <!-- Tab Switcher System -->
+    <div class="tabs-wrapper">
+      <button class="tab-btn active" id="tabEncryptBtn" onclick="switchTab('encrypt')">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        <span>Encrypt File</span>
+      </button>
+      <button class="tab-btn" id="tabDecryptBtn" onclick="switchTab('decrypt')">
+        <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+        <span>Decrypt Vault File</span>
+      </button>
+    </div>
+
+    <!-- 1. ENCRYPTION PANEL -->
+    <div id="encryptSection" class="tab-panel card active-panel">
+      <span class="card-header-badge">High-Security Engine</span>
+      <div class="card-title">Encrypt Any File Type</div>
+      <div class="card-description">Convert Images, Videos, Audio, PDFs, Documents, Text, or Archives into an encrypted <code>.vault</code> container payload.</div>
+
+      <div class="dropzone" id="encryptDropzone">
+        <svg class="dropzone-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+        <div class="dropzone-text">Click to choose or drag a file here</div>
+        <div class="dropzone-sub">Supports files of any size or format</div>
+        <input type="file" id="fileInput" onchange="updateFileName('fileInput', 'encryptFileName')">
+        <div id="encryptFileName" class="file-selected-name"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="label" for="encryptPassword">Master Encryption Password</label>
+        <input type="password" id="encryptPassword" class="input-field" placeholder="Enter a password to derive your key">
+      </div>
+
+      <button class="btn-primary" id="btnEncrypt" onclick="encryptAndSave()">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        <span id="btnEncryptText">Encrypt & Download .vault Container</span>
+      </button>
+    </div>
+
+    <!-- 2. DECRYPTION PANEL -->
+    <div id="decryptSection" class="tab-panel card">
+      <span class="card-header-badge">Authenticated Decryption</span>
+      <div class="card-title">Decrypt & Live Preview</div>
+      <div class="card-description">Select an encrypted <code>.vault</code> file and enter the secret password to unpack and render the file in real-time.</div>
+
+      <div class="dropzone" id="decryptDropzone">
+        <svg class="dropzone-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+        <div class="dropzone-text">Select a .vault container file</div>
+        <div class="dropzone-sub">Only encrypted .vault files are accepted</div>
+        <input type="file" id="vaultFileInput" accept=".vault" onchange="updateFileName('vaultFileInput', 'decryptFileName')">
+        <div id="decryptFileName" class="file-selected-name"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="label" for="decryptPassword">Master Password</label>
+        <input type="password" id="decryptPassword" class="input-field" placeholder="Enter password used during encryption">
+      </div>
+
+      <button class="btn-primary" id="btnDecrypt" onclick="decryptVaultFile()">
+        <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+        <span id="btnDecryptText">Decrypt & Render File</span>
+      </button>
+
+      <!-- Dynamic Preview Container -->
+      <div id="previewArea" class="preview-card" style="display:none;"></div>
+    </div>
+
+  </main>
+
+  <!-- PROFESSIONAL FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand-info">
+        <div>© 2026 <strong>RedVault 256</strong>. Built by <strong>AlphaGroup</strong>.</div>
+        <div class="footer-credits">Developer: <span>Bharath Raj</span></div>
+      </div>
+      <div class="footer-links">
+        <button class="footer-link-btn" onclick="showTerms()">Terms & Conditions</button>
+        <span>•</span>
+        <button class="footer-link-btn" onclick="showPrivacy()">Privacy Policy</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // --- AUTOMATIC LOADING SPLASH SCREEN DISMISSAL ---
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const splash = document.getElementById('splashScreen');
+        if (splash) {
+          splash.classList.add('dismissed');
+        }
+      }, 2600);
+    });
+
+    // --- FOOTER MODAL UTILITIES ---
+    function showTerms() {
+      alert("RedVault 256 — Terms & Conditions:\n\n1. Zero-Knowledge Architecture: All encryption and decryption processes take place entirely inside your local browser.\n2. Password Recovery: Your password is never saved or transmitted. If lost, your encrypted files cannot be recovered.\n3. Usage: Provided by AlphaGroup for secure file privacy.");
+    }
+
+    function showPrivacy() {
+      alert("RedVault 256 — Privacy Policy:\n\n1. No Server Transmissions: No data, files, or telemetry are ever uploaded or stored on any external server.\n2. Client-Side WebCrypto: All cryptographic keys are derived locally using client hardware API.");
+    }
+
+    // --- TAB SWITCHING SYSTEM ---
+    function switchTab(tab) {
+      const encryptSec = document.getElementById('encryptSection');
+      const decryptSec = document.getElementById('decryptSection');
+      const tabEncryptBtn = document.getElementById('tabEncryptBtn');
+      const tabDecryptBtn = document.getElementById('tabDecryptBtn');
+
+      if (tab === 'encrypt') {
+        decryptSec.classList.remove('active-panel');
+        tabDecryptBtn.classList.remove('active');
+        setTimeout(() => {
+          decryptSec.style.display = 'none';
+          encryptSec.style.display = 'block';
+          requestAnimationFrame(() => {
+            encryptSec.classList.add('active-panel');
+            tabEncryptBtn.classList.add('active');
+          });
+        }, 150);
+      } else {
+        encryptSec.classList.remove('active-panel');
+        tabEncryptBtn.classList.remove('active');
+        setTimeout(() => {
+          encryptSec.style.display = 'none';
+          decryptSec.style.display = 'block';
+          requestAnimationFrame(() => {
+            decryptSec.classList.add('active-panel');
+            tabDecryptBtn.classList.add('active');
+          });
+        }, 150);
+      }
+    }
+
+    // --- DRAG & DROP VISUAL STATES ---
+    ['encryptDropzone', 'decryptDropzone'].forEach(id => {
+      const dropzone = document.getElementById(id);
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); });
+      });
+    });
+
+    function updateFileName(inputId, targetId) {
+      const file = document.getElementById(inputId).files[0];
+      const target = document.getElementById(targetId);
+      if (file) {
+        target.innerText = `Selected File: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+      }
+    }
+
+    // --- CRYPTO ENGINE: Key Derivation ---
+    async function deriveKey(password, salt) {
+      const encoder = new TextEncoder();
+      const baseKey = await window.crypto.subtle.importKey(
+        "raw", encoder.encode(password), "PBKDF2", false, ["deriveKey"]
+      );
+      return window.crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+        baseKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    // --- ENCRYPT FILE ENGINE ---
+    async function encryptAndSave() {
+      const fileInput = document.getElementById('fileInput');
+      const password = document.getElementById('encryptPassword').value;
+      const btnText = document.getElementById('btnEncryptText');
+
+      if (!fileInput.files[0] || !password) {
+        return alert("Please select a file and enter a password.");
+      }
+
+      btnText.innerText = "Encrypting File...";
+
+      try {
+        const file = fileInput.files[0];
+        const fileBuffer = await file.arrayBuffer();
+
+        const meta = JSON.stringify({ name: file.name, type: file.type || 'application/octet-stream' });
+        const metaBytes = new TextEncoder().encode(meta);
+
+        const payloadLength = 4 + metaBytes.byteLength + fileBuffer.byteLength;
+        const combinedPayload = new Uint8Array(payloadLength);
+        const view = new DataView(combinedPayload.buffer);
+
+        view.setUint32(0, metaBytes.byteLength, true);
+        combinedPayload.set(metaBytes, 4);
+        combinedPayload.set(new Uint8Array(fileBuffer), 4 + metaBytes.byteLength);
+
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+        const key = await deriveKey(password, salt);
+        const ciphertext = await window.crypto.subtle.encrypt(
+          { name: "AES-GCM", iv }, key, combinedPayload
+        );
+
+        const finalVaultBuffer = new Uint8Array(salt.byteLength + iv.byteLength + ciphertext.byteLength);
+        finalVaultBuffer.set(salt, 0);
+        finalVaultBuffer.set(iv, 16);
+        finalVaultBuffer.set(new Uint8Array(ciphertext), 28);
+
+        const blob = new Blob([finalVaultBuffer], { type: 'application/octet-stream' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${file.name}.vault`;
+        a.click();
+
+      } catch (err) {
+        console.error(err);
+        alert("Encryption failed. Please try again.");
+      } finally {
+        btnText.innerText = "Encrypt & Download .vault Container";
+      }
+    }
+
+    // --- DECRYPT FILE ENGINE ---
+    async function decryptVaultFile() {
+      const vaultFileInput = document.getElementById('vaultFileInput');
+      const password = document.getElementById('decryptPassword').value;
+      const btnText = document.getElementById('btnDecryptText');
+
+      if (!vaultFileInput.files[0] || !password) {
+        return alert("Please select a .vault file and enter password.");
+      }
+
+      btnText.innerText = "Decrypting File...";
+
+      try {
+        const vaultBuffer = new Uint8Array(await vaultFileInput.files[0].arrayBuffer());
+
+        const salt = vaultBuffer.slice(0, 16);
+        const iv = vaultBuffer.slice(16, 28);
+        const ciphertext = vaultBuffer.slice(28);
+
+        const key = await deriveKey(password, salt);
+        const decryptedBuffer = await window.crypto.subtle.decrypt(
+          { name: "AES-GCM", iv }, key, ciphertext
+        );
+
+        const view = new DataView(decryptedBuffer);
+        const metaLength = view.getUint32(0, true);
+        const metaBytes = new Uint8Array(decryptedBuffer, 4, metaLength);
+        const meta = JSON.parse(new TextDecoder().decode(metaBytes));
+
+        const fileBytes = decryptedBuffer.slice(4 + metaLength);
+        const fileBlob = new Blob([fileBytes], { type: meta.type });
+        const fileUrl = URL.createObjectURL(fileBlob);
+
+        renderPreview(meta, fileBlob, fileUrl);
+
+      } catch (err) {
+        console.error(err);
+        alert("Decryption failed! Incorrect password or corrupted .vault payload.");
+      } finally {
+        btnText.innerText = "Decrypt & Render File";
+      }
+    }
+
+    // --- DYNAMIC MULTI-MEDIA PREVIEW RENDERER ---
+    function renderPreview(meta, blob, url) {
+      const previewArea = document.getElementById('previewArea');
+      previewArea.style.display = 'block';
+      
+      let mediaHtml = '';
+      const type = meta.type.toLowerCase();
+
+      if (type.startsWith('image/')) {
+        mediaHtml = `<img src="${url}" alt="Decrypted Image">`;
+      } else if (type.startsWith('video/')) {
+        mediaHtml = `<video controls src="${url}"></video>`;
+      } else if (type.startsWith('audio/')) {
+        mediaHtml = `<audio controls src="${url}"></audio>`;
+      } else if (type === 'application/pdf') {
+        mediaHtml = `<iframe src="${url}"></iframe>`;
+      } else if (type.startsWith('text/') || meta.name.endsWith('.txt') || meta.name.endsWith('.json')) {
+        blob.text().then(text => {
+          document.getElementById('textPreviewBox').innerText = text;
+        });
+        mediaHtml = `<pre id="textPreviewBox">Loading text...</pre>`;
+      } else {
+        mediaHtml = `<p style="color: var(--text-muted); padding: 20px;">Preview non-renderable for type <code>${meta.type}</code>. Use the download button below.</p>`;
+      }
+
+      previewArea.innerHTML = `
+        <h3 style="color: var(--text-main); font-size: 1.1rem; font-weight: 700;">Decrypted: ${meta.name}</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Type: <code>${meta.type}</code></p>
+        <div class="preview-content">${mediaHtml}</div>
+        <a href="${url}" download="${meta.name}" style="text-decoration:none;">
+          <button class="btn-primary" style="margin: 20px auto 0 auto; max-width: 280px;">Download Original File</button>
+        </a>
+      `;
+    }
+  </script>
+</body>
+</html>
