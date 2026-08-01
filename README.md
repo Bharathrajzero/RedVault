@@ -1,14 +1,14 @@
 <div align="center">
-
-  <!-- Logo / Image Placeholder -->
-  <img src="public/logo.png" alt="RedVault 256 Logo" width="120" height="120">  
-
-  # RedVault 256
-
+  <h1>
+    <img src="https://raw.githubusercontent.com/Bharathrajzero/RedVault/main/public/logo.png" alt="RedVault 256 Logo" width="30" style="vertical-align: bottom;" />
+    <span style="vertical-align: bottom; display: inline-block; line-height: 1;">
+      <span style="color: #00f0ff;">RedVault</span> <span style="color: #ff007f;">256</span>
+    </span>
+  </h1>
+  <p><b>A Multi-Media Vault & Encryption Engine.</b></p>
+  <p>
+</div>
   <p align="center">
-    <b>A Multi-Media Vault & Encryption Engine.</b>
-    <br />
-    ·
     <a href="https://github.com/Bharathrajzero/RedVault/issues/new?template=bug_report.md">Report Bug</a>
     ·
     <a href="https://github.com/Bharathrajzero/RedVault/issues/new?template=feature_request.md">Request Feature</a>
